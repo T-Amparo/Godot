@@ -1,0 +1,52 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://assets/3D Models/Scenery/Decorations/Heart/Heart.glb" type="PackedScene" id=1]
+[ext_resource path="res://assets/Scripts/Scenery/Decorations/Heart/Heart.gd" type="Script" id=2]
+
+[sub_resource type="CapsuleShape" id=3]
+radius = 0.407074
+height = 0.309063
+
+[sub_resource type="AnimationNodeAnimation" id=7]
+animation = "Take 001"
+
+[sub_resource type="AnimationNodeAnimation" id=4]
+animation = "Take 001"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=8]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=9]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachine" id=5]
+states/Rotation/node = SubResource( 4 )
+states/Rotation/position = Vector2( 75, 35 )
+states/Rotation-Loop/node = SubResource( 7 )
+states/Rotation-Loop/position = Vector2( 322, 35 )
+transitions = [ "Rotation", "Rotation-Loop", SubResource( 8 ), "Rotation-Loop", "Rotation", SubResource( 9 ) ]
+start_node = "Rotation"
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id=6]
+
+[node name="Heart" type="Spatial"]
+script = ExtResource( 2 )
+
+[node name="Model" parent="." instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.479643, 0 )
+
+[node name="CollectionSensor" type="Area" parent="."]
+
+[node name="CollectionArea" type="CollisionShape" parent="CollectionSensor"]
+transform = Transform( 0.516695, 0, 0, 0, -1.41728e-08, -0.324236, 0, 0.253636, -1.10868e-08, 3.60012e-05, 0.207485, -0.00913292 )
+shape = SubResource( 3 )
+
+[node name="Movements" type="AnimationTree" parent="."]
+tree_root = SubResource( 5 )
+anim_player = NodePath("../Model/AnimationPlayer")
+active = true
+parameters/playback = SubResource( 6 )
+
+[connection signal="body_entered" from="CollectionSensor" to="." method="_on_CollectionSensor_body_entered"]

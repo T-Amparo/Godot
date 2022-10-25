@@ -1,0 +1,127 @@
+[gd_scene load_steps=22 format=2]
+
+[ext_resource path="res://assets/3D Models/Characters/Steve/Steve.glb" type="PackedScene" id=1]
+[ext_resource path="res://assets/Scripts/Characters/Steve/Steve.gd" type="Script" id=2]
+[ext_resource path="res://assets/Scripts/Characters/Steve/SteveVision.gd" type="Script" id=3]
+[ext_resource path="res://assets/Contents/Img/HealthBarBack.png" type="Texture" id=4]
+[ext_resource path="res://assets/Contents/Img/HealthBarFront.png" type="Texture" id=5]
+[ext_resource path="res://assets/Contents/Fonts/GhostWildWest.ttf" type="DynamicFontData" id=6]
+[ext_resource path="res://assets/Scripts/Characters/Steve/SteveHealthBar.gd" type="Script" id=7]
+
+[sub_resource type="CapsuleShape" id=1]
+margin = 0.001
+radius = 0.0943333
+height = 0.191373
+
+[sub_resource type="DynamicFont" id=21]
+size = 40
+extra_spacing_char = 5
+font_data = ExtResource( 6 )
+
+[sub_resource type="StyleBoxEmpty" id=22]
+
+[sub_resource type="AnimationNodeAnimation" id=12]
+animation = "Armature|Pose"
+
+[sub_resource type="AnimationNodeAnimation" id=18]
+animation = "Armature|Run"
+
+[sub_resource type="AnimationNodeAnimation" id=13]
+animation = "Armature|Run"
+
+[sub_resource type="AnimationNodeAnimation" id=15]
+animation = "Armature|Walk"
+
+[sub_resource type="AnimationNodeAnimation" id=14]
+animation = "Armature|Walk"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=16]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=17]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=19]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=20]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachine" id=10]
+states/Pose/node = SubResource( 12 )
+states/Pose/position = Vector2( -1594.86, 19.5263 )
+states/Run/node = SubResource( 13 )
+states/Run/position = Vector2( -1594.86, 159.526 )
+states/Run-Loop/node = SubResource( 18 )
+states/Run-Loop/position = Vector2( -1403.86, 159.526 )
+states/Walk/node = SubResource( 14 )
+states/Walk/position = Vector2( -1594.86, 88.5263 )
+states/Walk-Loop/node = SubResource( 15 )
+states/Walk-Loop/position = Vector2( -1403.86, 88.5263 )
+transitions = [ "Walk", "Walk-Loop", SubResource( 16 ), "Walk-Loop", "Walk", SubResource( 17 ), "Run", "Run-Loop", SubResource( 19 ), "Run-Loop", "Run", SubResource( 20 ) ]
+start_node = "Pose"
+end_node = "Pose"
+graph_offset = Vector2( -1660.86, -30.4737 )
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id=11]
+
+[node name="Steve" type="KinematicBody" groups=["Player"]]
+script = ExtResource( 2 )
+
+[node name="Model" parent="." instance=ExtResource( 1 )]
+transform = Transform( 0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01, 0, 0, 0 )
+
+[node name="Body" type="CollisionShape" parent="."]
+transform = Transform( 0.223323, -7.78985, 0, 15.606, -0.354766, 0, 0, 0, 2.6875, 0.00733578, 1.37465, 0.0528721 )
+shape = SubResource( 1 )
+
+[node name="HealthBar" type="Spatial" parent="."]
+script = ExtResource( 7 )
+
+[node name="Bar" type="TextureProgress" parent="HealthBar"]
+self_modulate = Color( 1, 1, 1, 0.392157 )
+margin_left = 43.196
+margin_top = 468.0
+margin_right = 1643.2
+margin_bottom = 1868.0
+rect_rotation = 45.0
+rect_scale = Vector2( 0.08, 0.08 )
+texture_under = ExtResource( 5 )
+texture_progress = ExtResource( 4 )
+fill_mode = 3
+
+[node name="Ratio" type="Label" parent="HealthBar"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_left = 80.0
+margin_top = -130.0
+margin_right = 154.0
+margin_bottom = -102.0
+rect_rotation = 45.0
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_colors/font_color_shadow = Color( 0.164706, 0.156863, 0.192157, 0.588235 )
+custom_constants/shadow_offset_x = 2
+custom_constants/shadow_offset_y = 2
+custom_fonts/font = SubResource( 21 )
+custom_styles/normal = SubResource( 22 )
+align = 1
+valign = 1
+
+[node name="SteveVision" type="SpringArm" parent="."]
+spring_length = 7.0
+margin = 0.2
+script = ExtResource( 3 )
+
+[node name="Vision" type="Camera" parent="SteveVision"]
+current = true
+
+[node name="Movements" type="AnimationTree" parent="."]
+tree_root = SubResource( 10 )
+anim_player = NodePath("../Model/AnimationPlayer")
+active = true
+root_motion_track = NodePath("Sketchfab_model/7ff9445faa2c4554bc010a603e425939fbx/Object_2/RootNode/Armature/Object_5/Skeleton:_rootJoint")
+parameters/playback = SubResource( 11 )

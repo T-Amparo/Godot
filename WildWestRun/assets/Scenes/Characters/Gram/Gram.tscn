@@ -1,0 +1,209 @@
+[gd_scene load_steps=33 format=2]
+
+[ext_resource path="res://assets/3D Models/Characters/Gram/Gram.glb" type="PackedScene" id=1]
+[ext_resource path="res://assets/Scripts/Characters/Gram/Gram.gd" type="Script" id=2]
+[ext_resource path="res://assets/Contents/Img/HealthBarBack.png" type="Texture" id=3]
+[ext_resource path="res://assets/Scripts/Characters/Gram/GramHealthBar.gd" type="Script" id=4]
+
+[sub_resource type="CapsuleShape" id=1]
+margin = 0.001
+radius = 0.0560732
+height = 0.294641
+
+[sub_resource type="ViewportTexture" id=22]
+viewport_path = NodePath("HealthBar")
+
+[sub_resource type="CapsuleShape" id=28]
+radius = 0.255427
+height = 0.002
+
+[sub_resource type="CapsuleShape" id=29]
+radius = 0.0821513
+height = 0.0123335
+
+[sub_resource type="AnimationNodeAnimation" id=34]
+animation = "Attack"
+
+[sub_resource type="AnimationNodeAnimation" id=33]
+animation = "Attack"
+
+[sub_resource type="AnimationNodeAnimation" id=36]
+animation = "Attack"
+
+[sub_resource type="AnimationNodeAnimation" id=37]
+animation = "Jump"
+
+[sub_resource type="AnimationNodeAnimation" id=38]
+animation = "warte_pose"
+
+[sub_resource type="AnimationNodeAnimation" id=41]
+animation = "die"
+
+[sub_resource type="AnimationNodeAnimation" id=42]
+animation = "die 2"
+
+[sub_resource type="AnimationNodeAnimation" id=51]
+animation = "warte_pose"
+
+[sub_resource type="AnimationNodeAnimation" id=52]
+animation = "warte_pose"
+
+[sub_resource type="AnimationNodeAnimation" id=45]
+animation = "run_ani_vor"
+
+[sub_resource type="AnimationNodeAnimation" id=43]
+animation = "run_ani_vor"
+
+[sub_resource type="AnimationNodeAnimation" id=46]
+animation = "walk_ani_vor"
+
+[sub_resource type="AnimationNodeAnimation" id=44]
+animation = "walk_ani_vor"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=35]
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=39]
+auto_advance = true
+priority = 10
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=40]
+switch_mode = 2
+auto_advance = true
+xfade_time = 0.5
+priority = 10
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=47]
+switch_mode = 1
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=48]
+switch_mode = 1
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=49]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=50]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=53]
+switch_mode = 1
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=54]
+switch_mode = 2
+auto_advance = true
+
+[sub_resource type="AnimationNodeStateMachine" id=31]
+states/Attack/node = SubResource( 33 )
+states/Attack/position = Vector2( 77, 46 )
+states/Attack-Loop/node = SubResource( 34 )
+states/Attack-Loop/position = Vector2( 280, 46 )
+states/Combo-Attack/node = SubResource( 36 )
+states/Combo-Attack/position = Vector2( 614, 126 )
+states/Combo-Jump/node = SubResource( 37 )
+states/Combo-Jump/position = Vector2( 344, 126 )
+states/ComboAttack/node = SubResource( 38 )
+states/ComboAttack/position = Vector2( 98, 126 )
+states/FallBack/node = SubResource( 41 )
+states/FallBack/position = Vector2( 98, 212 )
+states/FallFront/node = SubResource( 42 )
+states/FallFront/position = Vector2( 298, 212 )
+states/Pose/node = SubResource( 52 )
+states/Pose/position = Vector2( 77, 455.744 )
+states/Pose-Loop/node = SubResource( 51 )
+states/Pose-Loop/position = Vector2( 295, 455.744 )
+states/Run/node = SubResource( 43 )
+states/Run/position = Vector2( 77, 374 )
+states/Run-Loop/node = SubResource( 45 )
+states/Run-Loop/position = Vector2( 295, 376.06 )
+states/Walk/node = SubResource( 44 )
+states/Walk/position = Vector2( 77, 300 )
+states/Walk-Loop/node = SubResource( 46 )
+states/Walk-Loop/position = Vector2( 280, 300 )
+transitions = [ "Attack", "Attack-Loop", SubResource( 35 ), "ComboAttack", "Combo-Jump", SubResource( 39 ), "Combo-Jump", "Combo-Attack", SubResource( 40 ), "Walk", "Walk-Loop", SubResource( 47 ), "Run", "Run-Loop", SubResource( 48 ), "Walk-Loop", "Walk", SubResource( 49 ), "Run-Loop", "Run", SubResource( 50 ), "Pose", "Pose-Loop", SubResource( 53 ), "Pose-Loop", "Pose", SubResource( 54 ) ]
+start_node = "Pose"
+graph_offset = Vector2( 0, -37.721 )
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id=32]
+
+[node name="Gram" type="KinematicBody"]
+script = ExtResource( 2 )
+
+[node name="Model" parent="." instance=ExtResource( 1 )]
+transform = Transform( 0.01, 0, 0, 0, 0.01, 0, 0, 0, 0.01, 0, 0, 0 )
+
+[node name="Body" type="CollisionShape" parent="."]
+transform = Transform( 2.05153, 0, 0, 0, 1.13404, 0, 0, 0, 1.05642, -0.00300594, 0.0341744, 0.00527551 )
+shape = SubResource( 1 )
+
+[node name="HealthBar" type="Viewport" parent="."]
+size = Vector2( 650, 550 )
+transparent_bg = true
+render_target_v_flip = true
+audio_listener_enable_3d = true
+physics_object_picking = true
+script = ExtResource( 4 )
+
+[node name="Bar" type="TextureProgress" parent="HealthBar"]
+margin_right = 1600.0
+margin_bottom = 1400.0
+rect_scale = Vector2( 0.4, 0.4 )
+texture_progress = ExtResource( 3 )
+fill_mode = 3
+tint_progress = Color( 0.611765, 0.188235, 0.188235, 1 )
+
+[node name="Display" type="Sprite3D" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.195673, 0 )
+pixel_size = 0.0001
+billboard = 1
+alpha_cut = 1
+texture = SubResource( 22 )
+
+[node name="AttackSensor" type="Area" parent="."]
+
+[node name="AttackArea" type="CollisionShape" parent="AttackSensor"]
+transform = Transform( 1, 0, 0, 0, 0.00535744, 0, 0, 0, 1, 0, 0.0477894, 0.00349087 )
+shape = SubResource( 28 )
+
+[node name="AttackTimer" type="Timer" parent="AttackSensor"]
+process_mode = 0
+wait_time = 1.2
+
+[node name="SensitivitySensor" type="Area" parent="."]
+
+[node name="SensitivityArea" type="CollisionShape" parent="SensitivitySensor"]
+transform = Transform( 0.470448, 0, 0, 0, -0.00393069, 0, 0, 0, 1.25636, 0, 0.118002, 0.0429571 )
+shape = SubResource( 29 )
+
+[node name="HuntingSensor" type="Area" parent="."]
+
+[node name="HuntingArea" type="CollisionShape" parent="HuntingSensor"]
+transform = Transform( 10, 0, 0, 0, 0.005, 0, 0, 0, 10, 0, 0.0477894, 0.00349087 )
+shape = SubResource( 28 )
+
+[node name="HuntingTimer" type="Timer" parent="HuntingSensor"]
+process_mode = 0
+wait_time = 0.1
+
+[node name="Track" type="NavigationAgent" parent="."]
+avoidance_enabled = true
+
+[node name="Movements" type="AnimationTree" parent="."]
+tree_root = SubResource( 31 )
+anim_player = NodePath("../Model/AnimationPlayer")
+active = true
+root_motion_track = NodePath("Sketchfab_model/Root/Spider_Armature/Skeleton:Spider_Armature_rootJoint")
+parameters/playback = SubResource( 32 )
+
+[connection signal="body_entered" from="AttackSensor" to="." method="_on_AttackSensor_body_entered"]
+[connection signal="body_exited" from="AttackSensor" to="." method="_on_AttackSensor_body_exited"]
+[connection signal="timeout" from="AttackSensor/AttackTimer" to="." method="_on_AttackTimer_timeout"]
+[connection signal="body_entered" from="SensitivitySensor" to="." method="_on_SensitivitySensor_body_entered"]
+[connection signal="body_entered" from="HuntingSensor" to="." method="_on_HuntingSensor_body_entered"]
+[connection signal="body_exited" from="HuntingSensor" to="." method="_on_HuntingSensor_body_exited"]
+[connection signal="timeout" from="HuntingSensor/HuntingTimer" to="." method="_on_HuntingTimer_timeout"]
+[connection signal="velocity_computed" from="Track" to="." method="_on_Track_velocity_computed"]
