@@ -1,52 +1,45 @@
-extends Spatial
-
-export var width = 10
-export var height = 10
+extends GridMap
 tool
+
+# Captura as configurações do Labirinto.
+
+var _options: Control = preload("res://assets/Scripts/Main/Options/Options.gd").new()
+
+# Configura a mecânica para geração do Labirinto.
+
+var _width = _options.Maze_Width
+var _height = _options.Maze_Height
+var _padding = _options.Maze_Padding
+
+var _block_size = _options.Maze_Block_Size
+var _block_extents = _options.Maze_Block_Extents
+
+# Define um classe que ira gerar o Labirinto.
+
 class Maze:
 	
 	var random = RandomNumberGenerator.new()
 	
-	var nodes = []
+	var halls = []
 	var maze = [[], []]
 	
-	var width
-	var height
-	var scale
+	var _width
+	var _height
+	var _padding
 	
-	var fill
-	var empty
+	var _fill
+	var _empty
 	
-	var block
-
-	func _init(width=10, height=10, scale=4, fill=1, empty=0):
+	func _init(width=10, height=10, padding=4, fill=1, empty=0):
 		
-		self.width = width
-		self.height = height
-		self.scale = scale
+		_width = width
+		_height = height
+		_padding = padding
 		
-		self.fill = fill
-		self.empty = empty
-
-		for _i in range(height):
-			
-			nodes.append(_vector(0, width, 1))
+		_fill = fill
+		_empty = empty
 		
-		nodes += [_vector(1, width + 1)]
-		
-		for _i in range(height + 1):
-			
-			if (_i < height): maze[0].append(_vector(_vector(empty, scale, fill, true), width, _vector(fill, 1)))
-			
-			maze[1].append(_vector(_vector(fill, scale, fill, true), width, _vector(fill, 1)))
-		
-		maze[0] += [[]]
-		
-		random.randomize()
-		
-		_walk(Vector2(random.randi_range(0, width - 1), random.randi_range(0, height - 1)))
-		
-		maze = _zip(maze[1], maze[0], scale)
+		_run()
 		
 	func _to_string():
 		
@@ -61,13 +54,110 @@ class Maze:
 				for _k in _j:
 				
 					string += str(_k)
-			
+					
 			string += '\n'
-		
+			
 		return string
-	
-	func _get(property): return property
-	
+		
+	func _run():
+		
+		for _i in range(_height):
+			
+			halls.append(_vector_fill(_empty, _width, _fill))
+			
+		halls += [_vector_fill(_fill, _width + 1)]
+		
+		for _i in range(_height + 1):
+			
+			if _i < _height: 
+				
+				maze[0].append(_vector_fill(_vector_fill(_empty, _padding, _fill, true), _width, _vector_fill(_fill, 1)))
+			
+			maze[1].append(_vector_fill(_vector_fill(_fill, _padding, _fill, true), _width, _vector_fill(_fill, 1)))
+			
+		maze[0] += [[]]
+		
+		random.randomize()
+		
+		_walk(Vector2(random.randi_range(0, _width - 1), random.randi_range(0, _height - 1)))
+		
+		maze = _zip(maze[1], maze[0], _padding)
+		
+	func _walk(coordinate):
+		
+		halls[coordinate.y][coordinate.x] = 1
+		
+		var directions = [
+			
+			Vector2(coordinate.x - 1, coordinate.y), 
+			Vector2(coordinate.x, coordinate.y + 1), 
+			Vector2(coordinate.x + 1, coordinate.y),
+			Vector2(coordinate.x, coordinate.y - 1)
+			
+		]
+		
+		directions.shuffle()
+		
+		for direction in directions:
+			
+			if halls[direction.y][direction.x]: 
+				
+				continue
+				
+			if (direction.x == coordinate.x): 
+				
+				maze[1][max(coordinate.y, direction.y)][coordinate.x] = _vector_fill(_empty, _padding, _fill, true)
+				
+			if (direction.y == coordinate.y): 
+				
+				maze[0][coordinate.y][max(coordinate.x, direction.x)] = _vector_fill(_empty, _padding + 1, _empty, true)
+				
+			_walk(Vector2(direction.x, direction.y))
+			
+	func _zip(vectorA, vectorB, padding=1):
+		
+		var vector = []
+		
+		for _i in (len(vectorA) if (len(vectorA) <= len(vectorB)) else len(vectorB)):
+			
+			vector.append(vectorA[_i])
+			
+			for _j in padding: 
+				
+				vector.append(vectorB[_i])
+				
+		return vector
+		
+	func _vector_fill(value, iteration, increment=null, front=false):
+		
+		var vector = []
+		
+		for _i in range(iteration):
+			
+			vector.append(value)
+			
+		if increment:
+			
+			if front:
+				
+				vector.insert(0, increment)
+				
+			else: 
+				
+				vector.append(increment)
+				
+		return vector
+		
+	func _numbers_to_string(numbers):
+		
+		var string = ''
+		
+		for number in numbers:
+			
+			string += str(number)
+			
+		return int(string)
+		
 	func _maze_asc():
 		
 		var maze_asc = []
@@ -75,6 +165,7 @@ class Maze:
 		var fill_asc_1 = '+'
 		var fill_asc_2 = '-'
 		var fill_asc_3 = '|'
+		
 		var empty_asc = ' '
 		
 		for _i in range(len(maze)):
@@ -85,129 +176,82 @@ class Maze:
 				
 				for _k in range(len(_j)):
 					
-					if (_j[_k] == fill):
+					if (_j[_k] == _fill):
 						
-						if (_k == 0):
-						
-							asc.append(fill_asc_1) if (_i % 2 == 0) else asc.append(fill_asc_3)
-						
+						if (_k == _empty):
+							
+							if (_i % 2 == 0):
+								
+								asc.append(fill_asc_1)
+								
+							else:
+								
+								asc.append(fill_asc_3)
+								
 						else:
 							
-							asc.append(fill_asc_2) if (_i % 2 == 0) else asc.append(fill_asc_3)
-					
-					else: asc.append(empty_asc)
-				
+							if (_i % 2 == 0):
+								
+								asc.append(fill_asc_2)
+								
+							else:
+								
+								asc.append(fill_asc_3)
+								
+					else: 
+						
+						asc.append(empty_asc)
+						
 			maze_asc.append(asc)
-		
+			
 		return maze_asc
-		
-	func _number(numbers):
-		
-		var string = ''
-		
-		for number in numbers:
 			
-			string += str(number)
+	func _render(grid, blocks, ground=true):
 		
-		return int(string)
+		grid.mesh_library = blocks
 		
-	func _zip(vectorA, vectorB, scale=1):
-		
-		var vector = []
-		
-		for _i in (len(vectorA) if (len(vectorA) <= len(vectorB)) else len(vectorB)):
+		for _i in range(len(maze)):
 			
-			vector.append(vectorA[_i])
+			var last_point = 0
 			
-			for _j in scale: vector.append(vectorB[_i])
-			
-		return vector
-		
-	func _vector(value, iteration, increment=null, front=false):
-		
-		var vector = []
-		
-		for _i in range(iteration):
-			
-			vector.append(value)
-		
-		if increment: vector.insert(0, increment) if (front) else vector.append(increment)
-		
-		return vector
-		
-	func _walk(coordinate):
-		
-		nodes[coordinate.y][coordinate.x] = 1
-
-		var direction = [
-			
-			Vector2(coordinate.x - 1, coordinate.y), 
-			Vector2(coordinate.x, coordinate.y + 1), 
-			Vector2(coordinate.x + 1, coordinate.y),
-			Vector2(coordinate.x, coordinate.y - 1)
-			
-		  ]
-		
-		direction.shuffle()
-
-		for vector in direction:
-
-			if (nodes[vector.y][vector.x]): continue
-
-			if (vector.x == coordinate.x): maze[1][max(coordinate.y, vector.y)][coordinate.x] = _vector(empty, scale, fill, true)
-
-			if (vector.y == coordinate.y): maze[0][coordinate.y][max(coordinate.x, vector.x)] = _vector(empty, scale + 1, empty, true)
-			
-			_walk(Vector2(vector.x, vector.y))
-	
-	func _create_block(size=Vector3(2, 2, 2)):
-		
-		var block = MeshLibrary.new()
-		
-		var cube = CubeMesh.new()
-		var shape = BoxShape.new()
-		
-		cube.size = size
-		shape.extents = Vector3((size.x * 0.36), (size.y * 0.36), (size.z * 0.36))
-		
-		block.create_item(0)
-		block.set_item_mesh(0, cube)
-		block.set_item_shapes(0, [shape])
-		
-		self.block = block
-		
-	func _render():
-		
-		var render = GridMap.new()
-		
-		var map = []
-		
-		for room in maze:
-			
-			var path = []
-			
-			for fill in room:
+			for _j in range(len(maze[_i])):
 				
-				path += fill
-			
-			map.append(path)
-		
-		if !block: _create_block()
-		
-		render.mesh_library = block
-		
-		for x in range(len(map)):
-			for z in range(len(map[x])):
-				
-				if (map[x][z]): render.set_cell_item(x, 0, z, 0)
-				
-				else: render.set_cell_item(x, 0, z, 1)
-		
-		return render
-		
+				for _k in range(len(maze[_i][_j])):
+					
+					if maze[_i][_j][_k]:
+						
+						grid.set_cell_item(_i, 0, last_point, _fill)
+						
+					else:
+						
+						grid.set_cell_item(_i, 0, last_point, _empty)
+						
+					last_point += 1
+					
 func _ready():
 	
-	var maze = Maze.new(width, height)
-	var grid = maze._render()
+	var blocks = MeshLibrary.new()
 	
-	add_child(grid)
+	var wall = CubeMesh.new()
+	var wall_shape = BoxShape.new()
+	
+	var ground = CubeMesh.new()
+	var ground_shape = BoxShape.new()
+	
+	wall.size = Vector3(_block_size, _block_size, _block_size)
+	ground.size = Vector3(_block_size, 1, _block_size)
+	
+	wall_shape.extents = Vector3(_block_size * _block_extents, _block_size * _block_extents, _block_size * _block_extents)
+	ground_shape.extents = Vector3(_block_size * _block_extents, 0.05, _block_size * _block_extents)
+	
+	blocks.create_item(0)
+	
+	blocks.create_item(1)
+	blocks.set_item_mesh(1, wall)
+	blocks.set_item_shapes(1, [wall_shape])
+	
+	blocks.create_item(2)
+	blocks.set_item_mesh(2, ground)
+	blocks.set_item_shapes(2, [ground_shape])
+	
+	Maze.new(_width, _height, _padding)._render(self, blocks)

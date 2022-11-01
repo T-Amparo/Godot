@@ -4,9 +4,17 @@ extends Control
 
 export var Godot = true
 
-# Define as configurações do Físicas do Cenário.
+# Define as configurações Físicas do Cenário.
 
 export var Gravity = 50.0
+
+# Define as configurações Físicas do Labirinto.
+
+export var Maze_Width = 10.0
+export var Maze_Height = 10.0
+export var Maze_Padding = 4.0
+export var Maze_Block_Size = 2.0
+export var Maze_Block_Extents = 0.35
 
 # Define as configurações do Player.
 
