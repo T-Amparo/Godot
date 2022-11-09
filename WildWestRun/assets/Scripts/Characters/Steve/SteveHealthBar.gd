@@ -16,3 +16,7 @@ func update(value):
 	
 	ratio.text = String(value)
 	
+	if bar.value > bar.max_value:
+		
+		bar.max_value = value
+	

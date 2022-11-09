@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=22 format=2]
 
 [ext_resource path="res://assets/3D Models/Characters/Simba/Simba.glb" type="PackedScene" id=1]
 [ext_resource path="res://assets/Scripts/Characters/Simba/Simba.gd" type="Script" id=2]
@@ -6,7 +6,6 @@
 [ext_resource path="res://assets/Contents/Img/HealthBarBack.png" type="Texture" id=4]
 
 [sub_resource type="CapsuleShape" id=1]
-height = 0.648711
 
 [sub_resource type="ViewportTexture" id=16]
 viewport_path = NodePath("HealthBar")
@@ -36,26 +35,19 @@ auto_advance = true
 [sub_resource type="AnimationNodeStateMachineTransition" id=9]
 switch_mode = 2
 auto_advance = true
-xfade_time = 1.0
 
 [sub_resource type="AnimationNodeStateMachineTransition" id=10]
 switch_mode = 1
 auto_advance = true
-priority = 0
 
 [sub_resource type="AnimationNodeStateMachineTransition" id=11]
 switch_mode = 2
 auto_advance = true
 
 [sub_resource type="AnimationNodeStateMachineTransition" id=12]
-switch_mode = 1
 auto_advance = true
-xfade_time = 10.0
+xfade_time = 0.5
 priority = 10
-
-[sub_resource type="AnimationNodeStateMachineTransition" id=13]
-switch_mode = 2
-auto_advance = true
 
 [sub_resource type="AnimationNodeStateMachine" id=14]
 states/Howl/node = SubResource( 3 )
@@ -70,68 +62,25 @@ states/Walk/node = SubResource( 7 )
 states/Walk/position = Vector2( 69, 112 )
 states/Walk-Loop/node = SubResource( 6 )
 states/Walk-Loop/position = Vector2( 246.2, 112 )
-transitions = [ "Pose", "Pose-Loop", SubResource( 8 ), "Pose-Loop", "Pose", SubResource( 9 ), "Walk", "Walk-Loop", SubResource( 10 ), "Walk-Loop", "Walk", SubResource( 11 ), "Howl", "Howl-Loop", SubResource( 12 ), "Howl-Loop", "Howl", SubResource( 13 ) ]
+transitions = [ "Pose", "Pose-Loop", SubResource( 8 ), "Pose-Loop", "Pose", SubResource( 9 ), "Walk", "Walk-Loop", SubResource( 10 ), "Walk-Loop", "Walk", SubResource( 11 ), "Howl", "Howl-Loop", SubResource( 12 ) ]
 start_node = "Pose"
 graph_offset = Vector2( -16.8002, 0 )
 
 [sub_resource type="AnimationNodeStateMachinePlayback" id=15]
 
-[node name="Simba" type="KinematicBody"]
+[sub_resource type="CapsuleShape" id=17]
+radius = 1.86976
+height = 0.002
+
+[sub_resource type="CapsuleShape" id=18]
+radius = 0.795948
+height = 0.002
+
+[node name="Simba" type="KinematicBody" groups=["Player"]]
 script = ExtResource( 2 )
 
 [node name="Model" parent="." instance=ExtResource( 1 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.345522, 0, 0 )
-
-[node name="BoneAttachment" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton" index="0"]
-transform = Transform( 0.237053, 0.13888, -0.961518, 0.590166, -0.806762, 0.0289722, -0.771693, -0.574323, -0.273208, 10.1626, 4.05896, -18.5578 )
-
-[node name="backToes4_L" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton/BoneAttachment" index="0"]
-transform = Transform( 1, -1.66533e-16, -5.29396e-23, 1.66533e-16, 1, -2.64698e-23, 5.29396e-23, 2.64698e-23, 1, -4.87355, -3.55271e-14, 2.45167e-09 )
-
-[node name="BoneAttachment2" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton" index="1"]
-transform = Transform( -0.234866, -0.144328, -0.961253, -0.586838, 0.80941, 0.0218549, 0.774893, 0.569232, -0.2748, -3.08491, 4.43201, -22.4176 )
-
-[node name="backToes4_R" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton/BoneAttachment2" index="0"]
-transform = Transform( 1, -5.55112e-17, 1.38778e-17, 5.55112e-17, 1, 7.70372e-34, -1.38778e-17, 0, 1, 4.87355, 5.32907e-14, -2.45169e-09 )
-
-[node name="BoneAttachment3" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton" index="2"]
-transform = Transform( 0.185982, 0.0970504, -0.977748, 0.559767, -0.828295, 0.0242601, -0.80751, -0.551823, -0.208374, 5.28161, 2.53598, 21.7621 )
-
-[node name="frontToes4_L" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton/BoneAttachment3" index="0"]
-transform = Transform( 1, -1.11022e-16, -7.70372e-34, 1.11022e-16, 1, 6.93889e-18, 0, -6.93889e-18, 1, -5.21207, -3.37508e-14, 1.04805e-13 )
-
-[node name="BoneAttachment4" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton" index="3"]
-transform = Transform( -0.151099, -0.0756217, -0.985622, -0.557459, 0.829919, 0.0217846, 0.816339, 0.552735, -0.167556, -10.2271, 2.88587, 19.7123 )
-
-[node name="frontToes4_R" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton/BoneAttachment4" index="0"]
-transform = Transform( 1, 1.54074e-33, 5.55112e-17, 0, 1, -2.77556e-17, -5.55112e-17, 2.77556e-17, 1, 5.21207, 2.30926e-14, 2.30926e-13 )
-
-[node name="BoneAttachment5" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton" index="4"]
-transform = Transform( 0.564494, -0.635352, -0.526948, -0.315302, -0.755948, 0.573696, -0.762845, -0.1577, -0.627056, 23.7188, 55.3605, 33.1947 )
-
-[node name="BoneAttachment6" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton" index="5"]
-transform = Transform( 0.692598, -0.635352, 0.341519, -0.648147, -0.755949, -0.0919086, 0.316565, -0.157699, -0.935371, 24.567, 53.1568, 40.3415 )
-
-[node name="BoneAttachment7" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton" index="6"]
-transform = Transform( 0.60631, -0.787204, -0.112688, -0.736812, -0.609411, 0.29279, -0.299159, -0.0944914, -0.949513, 22.556, 47.5705, 34.8941 )
-
-[node name="BoneAttachment8" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton" index="7"]
-transform = Transform( 0.782095, -0.612885, -0.112688, -0.563291, -0.772643, 0.29279, -0.266515, -0.165514, -0.949513, 18.1033, 50.0466, 36.186 )
-
-[node name="BoneAttachment9" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton" index="8"]
-transform = Transform( -0.247037, -0.96352, 0.102964, -0.931177, 0.20665, -0.300343, 0.268109, -0.170073, -0.948258, 16.9967, 68.9239, 35.326 )
-
-[node name="BoneAttachment10" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton" index="9"]
-transform = Transform( 0.359585, 0.889017, -0.283455, 0.638753, -0.0130746, 0.769301, 0.680216, -0.457687, -0.572564, 18.4545, 65.1361, 47.6096 )
-
-[node name="BoneAttachment11" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton" index="10"]
-transform = Transform( 0.940752, 0.319822, -0.112688, 0.339019, -0.894058, 0.29279, -0.00710949, -0.313647, -0.949513, 16.7482, 56.6318, 38.3775 )
-
-[node name="BoneAttachment12" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton" index="11"]
-transform = Transform( -1.44402e-16, -1.17852e-16, -1, -0.854544, -0.51938, 1.84607e-16, -0.51938, 0.854544, -2.57105e-17, 1.94236e-14, 17.036, -40.4207 )
-
-[node name="Tail6_M" parent="Model/Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton/BoneAttachment12" index="0"]
-transform = Transform( 1, 5.55112e-17, -1.38778e-17, -5.55112e-17, 1, 5.55112e-17, 1.38778e-17, -5.55112e-17, 1, 2.98287, 0, -9.76996e-14 )
 
 [node name="Body" type="CollisionShape" parent="."]
 transform = Transform( 0.173165, 0, 0, 0, -2.62585e-08, -0.300362, 0, 0.532035, -1.1628e-08, 0, 0.330622, 0.00972347 )
@@ -168,6 +117,27 @@ active = true
 root_motion_track = NodePath("Sketchfab_model/5e8947753cfc405e9029b0383a8ca301fbx/Object_2/RootNode/Coyote/Main/DeformationSystem/Object_9/Skeleton:Root_M_01")
 parameters/playback = SubResource( 15 )
 
-[connection signal="velocity_computed" from="Track" to="." method="_on_Track_velocity_computed"]
+[node name="DefenseSensor" type="Area" parent="."]
 
-[editable path="Model"]
+[node name="DefenseArea" type="CollisionShape" parent="DefenseSensor"]
+transform = Transform( 1, 0, 0, 0, 0.005, 0, 0, 0, 1, 0, 0.0477894, 0.00349087 )
+shape = SubResource( 17 )
+
+[node name="AttackSensor" type="Area" parent="."]
+
+[node name="AttackArea" type="CollisionShape" parent="AttackSensor"]
+transform = Transform( 1, 0, 0, 0, 0.005, 0, 0, 0, 1, 0, 0.0477894, 0.00349087 )
+shape = SubResource( 18 )
+
+[node name="AttackTimer" type="Timer" parent="AttackSensor"]
+wait_time = 1.2
+
+[node name="FollowTimer" type="Timer" parent="."]
+autostart = true
+
+[connection signal="velocity_computed" from="Track" to="." method="_on_Track_velocity_computed"]
+[connection signal="body_entered" from="DefenseSensor" to="." method="_on_DefenseSensor_body_entered"]
+[connection signal="body_exited" from="DefenseSensor" to="." method="_on_DefenseSensor_body_exited"]
+[connection signal="body_entered" from="AttackSensor" to="." method="_on_AttackSensor_body_entered"]
+[connection signal="body_exited" from="AttackSensor" to="." method="_on_AttackSensor_body_exited"]
+[connection signal="timeout" from="FollowTimer" to="." method="_on_FollowTimer_timeout"]

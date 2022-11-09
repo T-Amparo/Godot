@@ -2,10 +2,6 @@ extends KinematicBody
 
 var random = RandomNumberGenerator.new()
 
-# Captura as configurações dos Inimigos: Gram.
-
-var _options: Control = preload("res://assets/Scripts/Main/Options/Options.gd").new()
-
 # Captura a barra de saúde dos Inimigos: Gram.
 
 onready var _health_bar: Viewport = $HealthBar
@@ -43,15 +39,15 @@ var FallBack = 'FallBack'
 
 # Configura a mecânica para a movimentação dos Inimigos: Gram.
 
-var _health = _options.Gram_Health
-var _damage = _options.Gram_Damage
-var _damage_critical = _options.Gram_Damage_Critical
-var _hit_rate = _options.Gram_Hit_Rate
-var _hit_rate_critical = _options.Gram_Hit_Rate_Critical
+var _health = Options.Gram_Health
+var _damage = Options.Gram_Damage
+var _damage_critical = Options.Gram_Damage_Critical
+var _hit_rate = Options.Gram_Hit_Rate
+var _hit_rate_critical = Options.Gram_Hit_Rate_Critical
 
-var _walk_speed = _options.Gram_Walk_Speed
-var _run_speed = _options.Gram_Run_Speed
-var _jump_strength = _options.Gram_Jump_Strength
+var _walk_speed = Options.Gram_Walk_Speed
+var _run_speed = Options.Gram_Run_Speed
+var _jump_strength = Options.Gram_Jump_Strength
 
 var _acceleration = Vector3.ZERO
 var _jumping = Vector3.DOWN
@@ -94,12 +90,21 @@ func _attack(body):
 			
 			body._update_health(-_damage)
 			
-func _hunt(delta):
+func _move(delta):
 	
 	var target = _track.get_next_location()
 	var direction = global_transform.origin.direction_to(target)
 	var distance = global_transform.origin.distance_to(_player.global_transform.origin)
-	
+
+#	if is_on_floor() and direction.y > 0.2:
+#
+#		_acceleration.y = _jump_strength
+#		_jumping = Vector3.ZERO
+#
+#	elif is_on_floor() and _jumping == Vector3.ZERO:
+#
+#		_jumping = Vector3.DOWN
+		
 	if distance > 6:
 		
 		_animation_enemy(Run)
@@ -118,7 +123,7 @@ func _hunt(delta):
 	
 	_acceleration.x = direction.x * _track.max_speed
 	_acceleration.z = direction.z * _track.max_speed
-	_acceleration.y -= _options.Gravity * delta
+	_acceleration.y -= Options.Gravity * delta
 	
 	_model.rotation.y = lerp(_model.rotation.y, atan2(-direction.x, -direction.z), delta * _track.max_speed)
 	
@@ -134,10 +139,11 @@ func _physics_process(delta):
 	
 	if not _track.is_navigation_finished(): 
 		
-		_hunt(delta)
+		_move(delta)
 		
 	else:
 		
+		_animation_enemy(Pose)
 		_track.max_speed = 0
 		
 func _on_AttackSensor_body_entered(body):
@@ -146,18 +152,16 @@ func _on_AttackSensor_body_entered(body):
 		
 		_attack(body)
 		
+		$AttackSensor/AttackTimer.connect("timeout", self, "_attack", [body])
 		$AttackSensor/AttackTimer.start()
 		
 func _on_AttackSensor_body_exited(body):
 	
 	if body.is_in_group('Player') and _health >= 0:
 		
+		$AttackSensor/AttackTimer.disconnect("timeout", self, "_attack")
 		$AttackSensor/AttackTimer.stop()
 		
-func _on_AttackTimer_timeout():
-	
-	_attack(_player)
-	
 func _on_SensitivitySensor_body_entered(body):
 	
 	if body.is_in_group('Player') and _health >= 0:
@@ -170,11 +174,15 @@ func _on_HuntingSensor_body_entered(body):
 		
 		$HuntingSensor/HuntingTimer.start()
 		
+		$IdleTimer.stop()
+		
 func _on_HuntingSensor_body_exited(body):
 	
 	if body.is_in_group('Player') and _health >= 0:
 		
 		$HuntingSensor/HuntingTimer.stop()
+		
+		$IdleTimer.start()
 		
 func _on_HuntingTimer_timeout():
 	
@@ -184,3 +192,6 @@ func _on_Track_velocity_computed(safe_velocity):
 	
 	_acceleration = move_and_slide_with_snap(safe_velocity, _jumping, Vector3.UP, true)
 	
+func _on_IdleTimer_timeout():
+	
+	_track.set_target_location(Vector3.FORWARD * random.randf_range(0, 10))

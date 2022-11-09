@@ -1,9 +1,5 @@
 extends Spatial
 
-# Captura as configurações do Bônus: Heart.
-
-var _options: Control = preload("res://assets/Scripts/Main/Options/Options.gd").new()
-
 # Define o nome das animações do Bônus: Heart.
 
 var Rotation = 'Rotation'
@@ -14,7 +10,7 @@ onready var _animations: AnimationTree = $Movements
 
 # Configura os valores para o Bônus: Heart.
 
-var recharge = _options.Bonus_Heart_Recharge
+var recharge = Options.Bonus_Heart_Recharge
 
 func _animation_bonus(animation, animations=_animations, path='parameters/playback'): 
 	

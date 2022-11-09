@@ -14,7 +14,7 @@ height = 0.294641
 viewport_path = NodePath("HealthBar")
 
 [sub_resource type="CapsuleShape" id=28]
-radius = 0.255427
+radius = 0.499773
 height = 0.002
 
 [sub_resource type="CapsuleShape" id=29]
@@ -126,11 +126,11 @@ states/Walk-Loop/node = SubResource( 46 )
 states/Walk-Loop/position = Vector2( 280, 300 )
 transitions = [ "Attack", "Attack-Loop", SubResource( 35 ), "ComboAttack", "Combo-Jump", SubResource( 39 ), "Combo-Jump", "Combo-Attack", SubResource( 40 ), "Walk", "Walk-Loop", SubResource( 47 ), "Run", "Run-Loop", SubResource( 48 ), "Walk-Loop", "Walk", SubResource( 49 ), "Run-Loop", "Run", SubResource( 50 ), "Pose", "Pose-Loop", SubResource( 53 ), "Pose-Loop", "Pose", SubResource( 54 ) ]
 start_node = "Pose"
-graph_offset = Vector2( 0, -37.721 )
+graph_offset = Vector2( 0, 255.155 )
 
 [sub_resource type="AnimationNodeStateMachinePlayback" id=32]
 
-[node name="Gram" type="KinematicBody"]
+[node name="Gram" type="KinematicBody" groups=["Enemy"]]
 script = ExtResource( 2 )
 
 [node name="Model" parent="." instance=ExtResource( 1 )]
@@ -189,6 +189,11 @@ shape = SubResource( 28 )
 process_mode = 0
 wait_time = 0.1
 
+[node name="IdleTimer" type="Timer" parent="."]
+process_mode = 0
+wait_time = 2.0
+autostart = true
+
 [node name="Track" type="NavigationAgent" parent="."]
 avoidance_enabled = true
 
@@ -206,4 +211,5 @@ parameters/playback = SubResource( 32 )
 [connection signal="body_entered" from="HuntingSensor" to="." method="_on_HuntingSensor_body_entered"]
 [connection signal="body_exited" from="HuntingSensor" to="." method="_on_HuntingSensor_body_exited"]
 [connection signal="timeout" from="HuntingSensor/HuntingTimer" to="." method="_on_HuntingTimer_timeout"]
+[connection signal="timeout" from="IdleTimer" to="." method="_on_IdleTimer_timeout"]
 [connection signal="velocity_computed" from="Track" to="." method="_on_Track_velocity_computed"]

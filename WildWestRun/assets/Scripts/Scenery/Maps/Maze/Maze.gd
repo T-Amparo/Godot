@@ -1,18 +1,14 @@
 extends GridMap
 tool
 
-# Captura as configurações do Labirinto.
-
-var _options: Control = preload("res://assets/Scripts/Main/Options/Options.gd").new()
-
 # Configura a mecânica para geração do Labirinto.
 
-var _width = _options.Maze_Width
-var _height = _options.Maze_Height
-var _padding = _options.Maze_Padding
+var _width = Options.Maze_Width
+var _height = Options.Maze_Height
+var _padding = Options.Maze_Padding
 
-var _block_size = _options.Maze_Block_Size
-var _block_extents = _options.Maze_Block_Extents
+var _block_size = Options.Maze_Block_Size
+var _block_extents = Options.Maze_Block_Extents
 
 # Define um classe que ira gerar o Labirinto.
 
@@ -29,6 +25,12 @@ class Maze:
 	
 	var _fill
 	var _empty
+	
+	var _block
+	var _block_size
+	var _block_extents
+	
+	var elements = {}
 	
 	func _init(width=10, height=10, padding=4, fill=1, empty=0):
 		
@@ -65,7 +67,7 @@ class Maze:
 			
 			halls.append(_vector_fill(_empty, _width, _fill))
 			
-		halls += [_vector_fill(_fill, _width + 1)]
+		halls += [_vector_fill(_fill, _width, _fill)]
 		
 		for _i in range(_height + 1):
 			
@@ -74,7 +76,7 @@ class Maze:
 				maze[0].append(_vector_fill(_vector_fill(_empty, _padding, _fill, true), _width, _vector_fill(_fill, 1)))
 			
 			maze[1].append(_vector_fill(_vector_fill(_fill, _padding, _fill, true), _width, _vector_fill(_fill, 1)))
-			
+		
 		maze[0] += [[]]
 		
 		random.randomize()
@@ -205,10 +207,115 @@ class Maze:
 			maze_asc.append(asc)
 			
 		return maze_asc
-			
-	func _render(grid, blocks, ground=true):
 		
-		grid.mesh_library = blocks
+	func _is_coordinate_valid(coordinate):
+		
+		coordinate = _coordinate_convert(coordinate)
+		
+		if coordinate.x > (_height * (_padding + 1)):
+			
+			return false
+			
+		elif coordinate.y > _width:
+			
+			return false
+			
+		elif coordinate.z > _padding:
+			
+			return false
+			
+		else:
+			
+			return maze[coordinate.x][coordinate.y][coordinate.z] == _empty
+			
+	func _coordinate_convert(coordinate):
+		
+		var _i = int(coordinate.x / _block_size)
+		var _j = int(int(coordinate.z / _block_size) / (_padding + 1))
+		var _k = int(int(coordinate.z / _block_size) - (_j * (_padding + 1)))
+		
+		return Vector3(_i, _j, _k)
+		
+	func _coordinate_to_grid(up=0):
+		
+		var _i = random.randi_range(1, ((_height * (_padding + 1)) * _block_size) - 1)
+		var _j = random.randi_range(1, ((_width * (_padding + 1)) * _block_size) - 1)
+		
+		while not _is_coordinate_valid(Vector3(_i, up, _j)):
+			
+			_i = random.randi_range(1, ((_height * (_padding + 1)) * _block_size) - 1)
+			_j = random.randi_range(1, ((_width * (_padding + 1)) * _block_size) - 1)
+			
+		return Vector3(_i, up, _j)
+		
+	func _insert(grid, node, distance=10, coordinate=null):
+		
+		var name = node.name
+		
+		grid.add_child(node)
+		
+		if name in elements:
+			
+			elements[name].append(node)
+			
+		else:
+			
+			elements[name] = [node]
+			
+		if not coordinate:
+			
+			var is_distant = false
+			
+			while not is_distant:
+				
+				coordinate = _coordinate_to_grid()
+				
+				for _i in elements[name]:
+					
+					if _i.global_transform.origin.distance_to(coordinate) < distance:
+						
+						is_distant = true
+						
+				is_distant = not is_distant
+				
+		node.transform.origin = coordinate
+		
+		var id = elements.keys().find(name) + (_empty + _fill) + 1
+		
+		coordinate = _coordinate_convert(coordinate)
+		
+		maze[coordinate.x][coordinate.y][coordinate.z] = id
+		
+	func _blocks(block_size, block_extents):
+		
+		var blocks = MeshLibrary.new()
+		
+		var wall = CubeMesh.new()
+		var wall_shape = BoxShape.new()
+		
+		var size = Vector3(block_size, block_size, block_size)
+		
+		var extents = block_size * block_extents
+		extents = Vector3(extents, extents, extents)
+		
+		wall.size = size
+		wall_shape.extents = extents
+		
+		blocks.create_item(0)
+		
+		blocks.create_item(1)
+		blocks.set_item_mesh(1, wall)
+		blocks.set_item_shapes(1, [wall_shape])
+		
+		_block = blocks
+		_block_size = block_size
+		_block_extents = _block_extents
+		
+		return blocks
+		
+	func _render(grid, block_size, block_extents):
+		
+		grid.mesh_library = _blocks(block_size, block_extents)
 		
 		for _i in range(len(maze)):
 			
@@ -230,28 +337,17 @@ class Maze:
 					
 func _ready():
 	
-	var blocks = MeshLibrary.new()
+	translation.x = -_width * (_padding + 1)
+	translation.z = -_height * (_padding + 1)
 	
-	var wall = CubeMesh.new()
-	var wall_shape = BoxShape.new()
+	var maze = Maze.new(_width, _height, _padding)
 	
-	var ground = CubeMesh.new()
-	var ground_shape = BoxShape.new()
+	maze._render(self, _block_size, _block_extents)
 	
-	wall.size = Vector3(_block_size, _block_size, _block_size)
-	ground.size = Vector3(_block_size, 1, _block_size)
-	
-	wall_shape.extents = Vector3(_block_size * _block_extents, _block_size * _block_extents, _block_size * _block_extents)
-	ground_shape.extents = Vector3(_block_size * _block_extents, 0.05, _block_size * _block_extents)
-	
-	blocks.create_item(0)
-	
-	blocks.create_item(1)
-	blocks.set_item_mesh(1, wall)
-	blocks.set_item_shapes(1, [wall_shape])
-	
-	blocks.create_item(2)
-	blocks.set_item_mesh(2, ground)
-	blocks.set_item_shapes(2, [ground_shape])
-	
-	Maze.new(_width, _height, _padding)._render(self, blocks)
+	for _i in Options.Spawner_Gram_Rate:
+		
+		maze._insert(self, Options.Spawner_Gram.instance(), 20)
+		
+	for _i in Options.Bonus_Heart:
+		
+		maze._insert(self, Options.Heart.instance(), 20)

@@ -136,8 +136,10 @@ func _update_health(value):
 	_health += value
 	_health_bar.update(_health)
 	
-	if _health < 0: queue_free()
-	
+	if _health < 0: 
+		
+		queue_free()
+		
 func _animation_player(animation, animations=_animations, path='parameters/playback'): 
 	
 	animations[path].travel(animation)
